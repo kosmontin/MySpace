@@ -4,6 +4,11 @@ from urllib.parse import urlparse
 import requests
 
 
+def get_file_extension(url):
+    extension = os.path.splitext(os.path.basename(urlparse(url).path))[-1]
+    return extension
+
+
 def download_image(url, path='images'):
     filename = os.path.basename(urlparse(url).path)
     response = requests.get(url)
@@ -30,7 +35,8 @@ def fetch_spacex_last_launch():
 
 
 def main():
-    fetch_spacex_last_launch()
+    url = 'https://example.com/txt/hello%20world.txt?v=9#python'
+    print(get_file_extension(url))
 
 
 if __name__ == '__main__':
