@@ -13,7 +13,7 @@ def download_image(url, path='images'):
         file.write(response.content)
 
 
-def main():
+def fetch_spacex_last_launch():
     params = {
         'launch_year': 2020,
         'limit': 3
@@ -27,6 +27,10 @@ def main():
             flight_urls.extend(flight['links']['flickr_images'])
         for url in flight_urls:
             download_image(url)
+
+
+def main():
+    fetch_spacex_last_launch()
 
 
 if __name__ == '__main__':
