@@ -1,18 +1,19 @@
 import os
+from urllib.parse import urlparse
 
 import requests
 
 
 def download_image(url, path='images'):
+    filename = os.path.basename(urlparse(url).path)
     response = requests.get(url)
     response.raise_for_status()
     os.makedirs(path, exist_ok=True)
-    with open(os.path.join(path, 'hubble.jpeg'), 'wb') as file:
+    with open(os.path.join(path, filename), 'wb') as file:
         file.write(response.content)
 
 
 def main():
-    download_image('https://upload.wikimedia.org/wikipedia/commons/3/3f/HST-SM4.jpeg')
     params = {
         'launch_year': 2020,
         'limit': 3
@@ -20,9 +21,12 @@ def main():
     response = requests.get('https://api.spacexdata.com/v3/launches/', params=params)
     response.raise_for_status()
     flights = response.json()
+    flight_urls = []
     if flights:
         for flight in flights:
-            print(*flight['links']['flickr_images'], sep='\n')
+            flight_urls.extend(flight['links']['flickr_images'])
+        for url in flight_urls:
+            download_image(url)
 
 
 if __name__ == '__main__':
