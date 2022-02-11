@@ -35,8 +35,15 @@ def fetch_spacex_last_launch():
 
 
 def main():
-    url = 'https://example.com/txt/hello%20world.txt?v=9#python'
-    print(get_file_extension(url))
+    params = {
+        'api_key': 'DEMO_KEY',  # TODO: Add using .env via dotenv
+        'count': 30
+    }
+    response = requests.get('https://api.nasa.gov/planetary/apod', params=params)
+    response.raise_for_status()
+    photos = response.json()
+    for photo in photos:
+        download_image(photo['url'], 'images\\NASA')
 
 
 if __name__ == '__main__':
