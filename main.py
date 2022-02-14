@@ -2,6 +2,7 @@ import os
 from urllib.parse import urlparse, urlencode
 
 import requests
+from dotenv import load_dotenv
 
 
 def get_file_extension(url):
@@ -35,9 +36,11 @@ def fetch_spacex_last_launch():
 
 
 def main():
+    load_dotenv()
+    api_key = os.getenv('NASA_API_KEY')
     files_per_day = 'https://api.nasa.gov/EPIC/api/natural/date/2022-02-12'
     params = {
-        'api_key': 'DEMO_KEY',  # TODO: Add using .env via dotenv
+        'api_key': api_key
     }
     response = requests.get(files_per_day, params=params)
     response.raise_for_status()
