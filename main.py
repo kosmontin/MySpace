@@ -1,5 +1,5 @@
 import os
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 
 import requests
 
@@ -35,15 +35,20 @@ def fetch_spacex_last_launch():
 
 
 def main():
+    files_per_day = 'https://api.nasa.gov/EPIC/api/natural/date/2022-02-12'
     params = {
         'api_key': 'DEMO_KEY',  # TODO: Add using .env via dotenv
-        'count': 30
     }
-    response = requests.get('https://api.nasa.gov/planetary/apod', params=params)
+    response = requests.get(files_per_day, params=params)
     response.raise_for_status()
-    photos = response.json()
-    for photo in photos:
-        download_image(photo['url'], 'images\\NASA')
+    photos_info = response.json()
+    photo_ids = []
+    for photo in photos_info:
+        photo_ids.append(photo['image'])
+
+    for photo_id in photo_ids:
+        earth_photo_url = f'https://api.nasa.gov/EPIC/archive/natural/2022/02/12/png/{photo_id}.png?{urlencode(params)}'
+        download_image(earth_photo_url, 'images\\EARTH')
 
 
 if __name__ == '__main__':
