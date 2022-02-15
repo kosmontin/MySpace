@@ -2,7 +2,23 @@ import os
 from urllib.parse import urlparse, urlencode
 
 import requests
+import telegram
 from dotenv import load_dotenv
+
+
+def get_filepaths(folder='images'):
+    filepaths = []
+    for dirpath, dirnames, filenames in os.walk(folder):
+        filepaths.extend(os.path.join(dirpath, filename) for filename in filenames)
+    return filepaths
+
+
+def send_img_to_channel(filepath):
+    load_dotenv()
+    api_key = os.getenv('TELEGRAM_API_KEY')
+    chat_id = os.getenv('TELEGRAM_CHAT_ID')
+    bot = telegram.Bot(token=api_key)
+    bot.send_document(chat_id=chat_id, document=open(filepath, 'rb'))
 
 
 def get_file_extension(url):
