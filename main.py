@@ -1,4 +1,6 @@
 import os
+import random
+import time
 from urllib.parse import urlparse, urlencode
 
 import requests
@@ -86,9 +88,16 @@ def fetch_spacex_last_launch():
 
 
 def main():
+    load_dotenv()
+    delay = os.getenv('SEND_DELAY', 86400)
     fetch_spacex_last_launch()
     fetch_nasa_apod()
     fetch_nasa_epic()
+    filepaths = get_filepaths()
+    random.shuffle(filepaths)
+    for filepath in filepaths:
+        send_img_to_channel(filepath)
+        time.sleep(float(delay))
 
 
 if __name__ == '__main__':
