@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 def get_filepaths(folder='images'):
     filepaths = []
     for dirpath, dirnames, filenames in os.walk(folder):
-        filepaths.extend(os.path.join(dirpath, filename) for filename in filenames)
+        filepaths.extend(os.path.join(dirpath, filename) for filename in filenames if filename.endswith(
+            ('.jpeg', '.jpg', '.png', '.gif')))
     return filepaths
 
 
@@ -35,23 +36,7 @@ def download_image(url, path='images'):
         file.write(response.content)
 
 
-def fetch_spacex_last_launch():
-    params = {
-        'launch_year': 2020,
-        'limit': 3
-    }
-    response = requests.get('https://api.spacexdata.com/v3/launches/', params=params)
-    response.raise_for_status()
-    flights = response.json()
-    flight_urls = []
-    if flights:
-        for flight in flights:
-            flight_urls.extend(flight['links']['flickr_images'])
-        for url in flight_urls:
-            download_image(url)
-
-
-def main():
+def fetch_nasa_epic():
     load_dotenv()
     api_key = os.getenv('NASA_API_KEY')
     files_per_day = 'https://api.nasa.gov/EPIC/api/natural/date/2022-02-12'
@@ -67,7 +52,43 @@ def main():
 
     for photo_id in photo_ids:
         earth_photo_url = f'https://api.nasa.gov/EPIC/archive/natural/2022/02/12/png/{photo_id}.png?{urlencode(params)}'
-        download_image(earth_photo_url, 'images\\EARTH')
+        download_image(earth_photo_url, 'images\\NASA\\EPIC')
+
+
+def fetch_nasa_apod():
+    load_dotenv()
+    api_key = os.getenv('NASA_API_KEY')
+    params = {
+        'api_key': api_key,
+        'count': 30
+    }
+    response = requests.get('https://api.nasa.gov/planetary/apod', params=params)
+    response.raise_for_status()
+    photos = response.json()
+    for photo in photos:
+        download_image(photo['url'], 'images\\NASA\\APOD')
+
+
+def fetch_spacex_last_launch():
+    params = {
+        'launch_year': 2020,
+        'limit': 10
+    }
+    response = requests.get('https://api.spacexdata.com/v3/launches/', params=params)
+    response.raise_for_status()
+    flights = response.json()
+    flight_urls = []
+    if flights:
+        for flight in flights:
+            flight_urls.extend(flight['links']['flickr_images'])
+        for url in flight_urls:
+            download_image(url)
+
+
+def main():
+    fetch_spacex_last_launch()
+    fetch_nasa_apod()
+    fetch_nasa_epic()
 
 
 if __name__ == '__main__':
