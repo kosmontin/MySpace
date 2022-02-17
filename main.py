@@ -37,7 +37,7 @@ def download_image(url, path, params=None):
 
 def fetch_nasa_epic(api_key):
     files_per_day = 'https://api.nasa.gov/EPIC/api/natural/date/2022-02-12'
-    filespath = 'images/NASA/EPIC'
+    filespath = os.path.join('images', 'NASA', 'EPIC')
     params = {
         'api_key': api_key
     }
@@ -51,7 +51,7 @@ def fetch_nasa_epic(api_key):
 
 
 def fetch_nasa_apod(api_key):
-    filespath = 'images/NASA/APOD'
+    filespath = os.path.join('images', 'NASA', 'APOD')
     params = {
         'api_key': api_key,
         'count': 30
