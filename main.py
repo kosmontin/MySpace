@@ -27,9 +27,9 @@ def get_file_extension(url):
     return extension
 
 
-def download_image(url, path):
+def download_image(url, path, params=None):
     filename = os.path.basename(urlparse(url).path)
-    response = requests.get(url)
+    response = requests.get(url, params=params)
     response.raise_for_status()
     with open(os.path.join(path, filename), 'wb') as file:
         file.write(response.content)
@@ -44,13 +44,10 @@ def fetch_nasa_epic(api_key):
     response = requests.get(files_per_day, params=params)
     response.raise_for_status()
     photos_info = response.json()
-    photo_ids = []
-    for photo in photos_info:
-        photo_ids.append(photo['image'])
     os.makedirs(filespath, exist_ok=True)
-    for photo_id in photo_ids:
-        earth_photo_url = f'https://api.nasa.gov/EPIC/archive/natural/2022/02/12/png/{photo_id}.png?{urlencode(params)}'
-        download_image(earth_photo_url, filespath)
+    for photo in photos_info:
+        earth_photo_url = f'https://api.nasa.gov/EPIC/archive/natural/2022/02/12/png/{photo["image"]}.png'
+        download_image(earth_photo_url, filespath, params)
 
 
 def fetch_nasa_apod(api_key):
@@ -64,7 +61,7 @@ def fetch_nasa_apod(api_key):
     photos = response.json()
     os.makedirs(filespath, exist_ok=True)
     for photo in photos:
-        download_image(photo['url'], filespath)
+        download_image(photo['url'], filespath, params={'api_key': api_key})
 
 
 def fetch_spacex_last_launch():
