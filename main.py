@@ -27,17 +27,17 @@ def get_file_extension(url):
     return extension
 
 
-def download_image(url, path='images'):
+def download_image(url, path):
     filename = os.path.basename(urlparse(url).path)
     response = requests.get(url)
     response.raise_for_status()
-    os.makedirs(path, exist_ok=True)
     with open(os.path.join(path, filename), 'wb') as file:
         file.write(response.content)
 
 
 def fetch_nasa_epic(api_key):
     files_per_day = 'https://api.nasa.gov/EPIC/api/natural/date/2022-02-12'
+    filespath = 'images/NASA/EPIC'
     params = {
         'api_key': api_key
     }
@@ -47,13 +47,14 @@ def fetch_nasa_epic(api_key):
     photo_ids = []
     for photo in photos_info:
         photo_ids.append(photo['image'])
-
+    os.makedirs(filespath, exist_ok=True)
     for photo_id in photo_ids:
         earth_photo_url = f'https://api.nasa.gov/EPIC/archive/natural/2022/02/12/png/{photo_id}.png?{urlencode(params)}'
-        download_image(earth_photo_url, 'images\\NASA\\EPIC')
+        download_image(earth_photo_url, filespath)
 
 
 def fetch_nasa_apod(api_key):
+    filespath = 'images/NASA/APOD'
     params = {
         'api_key': api_key,
         'count': 30
@@ -61,11 +62,13 @@ def fetch_nasa_apod(api_key):
     response = requests.get('https://api.nasa.gov/planetary/apod', params=params)
     response.raise_for_status()
     photos = response.json()
+    os.makedirs(filespath, exist_ok=True)
     for photo in photos:
-        download_image(photo['url'], 'images\\NASA\\APOD')
+        download_image(photo['url'], filespath)
 
 
 def fetch_spacex_last_launch():
+    filespath = 'images'
     params = {
         'launch_year': 2020,
         'limit': 10
@@ -75,10 +78,11 @@ def fetch_spacex_last_launch():
     flights = response.json()
     flight_urls = []
     if flights:
+        os.makedirs(filespath, exist_ok=True)
         for flight in flights:
             flight_urls.extend(flight['links']['flickr_images'])
         for url in flight_urls:
-            download_image(url)
+            download_image(url, filespath)
 
 
 def main():
