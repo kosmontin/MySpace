@@ -16,10 +16,7 @@ def get_filepaths(folder='images'):
     return filepaths
 
 
-def send_img_to_channel(filepath):
-    load_dotenv()
-    api_key = os.getenv('TELEGRAM_API_KEY')
-    chat_id = os.getenv('TELEGRAM_CHAT_ID')
+def send_img_to_channel(api_key, chat_id, filepath):
     bot = telegram.Bot(token=api_key)
     bot.send_document(chat_id=chat_id, document=open(filepath, 'rb'))
 
@@ -38,9 +35,7 @@ def download_image(url, path='images'):
         file.write(response.content)
 
 
-def fetch_nasa_epic():
-    load_dotenv()
-    api_key = os.getenv('NASA_API_KEY')
+def fetch_nasa_epic(api_key):
     files_per_day = 'https://api.nasa.gov/EPIC/api/natural/date/2022-02-12'
     params = {
         'api_key': api_key
@@ -57,9 +52,7 @@ def fetch_nasa_epic():
         download_image(earth_photo_url, 'images\\NASA\\EPIC')
 
 
-def fetch_nasa_apod():
-    load_dotenv()
-    api_key = os.getenv('NASA_API_KEY')
+def fetch_nasa_apod(api_key):
     params = {
         'api_key': api_key,
         'count': 30
@@ -90,13 +83,16 @@ def fetch_spacex_last_launch():
 def main():
     load_dotenv()
     delay = os.getenv('SEND_DELAY', 86400)
+    telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
+    telegram_api_key = os.getenv('TELEGRAM_API_KEY')
+    nasa_api_key = os.getenv('NASA_API_KEY')
     fetch_spacex_last_launch()
-    fetch_nasa_apod()
-    fetch_nasa_epic()
+    fetch_nasa_apod(nasa_api_key)
+    fetch_nasa_epic(nasa_api_key)
     filepaths = get_filepaths()
     random.shuffle(filepaths)
     for filepath in filepaths:
-        send_img_to_channel(filepath)
+        send_img_to_channel(telegram_api_key, telegram_chat_id, filepath)
         time.sleep(float(delay))
 
 
