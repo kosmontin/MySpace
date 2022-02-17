@@ -18,7 +18,8 @@ def get_filepaths(folder='images'):
 
 def send_img_to_channel(api_key, chat_id, filepath):
     bot = telegram.Bot(token=api_key)
-    bot.send_document(chat_id=chat_id, document=open(filepath, 'rb'))
+    with open(filepath, 'rb') as file:
+        bot.send_document(chat_id=chat_id, document=file)
 
 
 def get_file_extension(url):
