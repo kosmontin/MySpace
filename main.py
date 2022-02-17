@@ -1,14 +1,14 @@
 import os
 import random
 import time
-from urllib.parse import urlparse, urlencode
+from urllib.parse import urlparse
 
 import requests
 import telegram
 from dotenv import load_dotenv
 
 
-def get_filepaths(folder='images'):
+def get_imagefile_paths(folder='images'):
     filepaths = []
     for dirpath, dirnames, filenames in os.walk(folder):
         filepaths.extend(os.path.join(dirpath, filename) for filename in filenames if filename.endswith(
@@ -91,7 +91,7 @@ def main():
     fetch_spacex_last_launch()
     fetch_nasa_apod(nasa_api_key)
     fetch_nasa_epic(nasa_api_key)
-    filepaths = get_filepaths()
+    filepaths = get_imagefile_paths()
     random.shuffle(filepaths)
     for filepath in filepaths:
         send_img_to_channel(telegram_api_key, telegram_chat_id, filepath)
