@@ -36,12 +36,12 @@ def download_image(url, path, params=None):
 
 
 def fetch_nasa_epic(api_key):
-    files_per_day = 'https://api.nasa.gov/EPIC/api/natural/date/2022-02-12'
+    photos_info_per_day_url = 'https://api.nasa.gov/EPIC/api/natural/date/2022-02-12'
     filespath = os.path.join('images', 'NASA', 'EPIC')
     params = {
         'api_key': api_key
     }
-    response = requests.get(files_per_day, params=params)
+    response = requests.get(photos_info_per_day_url, params=params)
     response.raise_for_status()
     photos_info = response.json()
     os.makedirs(filespath, exist_ok=True)
