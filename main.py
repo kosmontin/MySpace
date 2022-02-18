@@ -1,6 +1,7 @@
 import os
 import random
 import time
+from _datetime import datetime
 from urllib.parse import urlparse
 
 import requests
@@ -36,17 +37,25 @@ def download_image(url, path, params=None):
 
 
 def fetch_nasa_epic(api_key):
-    photos_info_per_day_url = 'https://api.nasa.gov/EPIC/api/natural/date/2022-02-12'
+    most_recent_date_url = 'https://api.nasa.gov/EPIC/api/natural/images'
     filespath = os.path.join('images', 'NASA', 'EPIC')
     params = {
         'api_key': api_key
     }
+
+    response = requests.get(most_recent_date_url, params=params)
+    response.raise_for_status()
+    dates_info = response.json()
+    date = datetime.strptime(dates_info[0]['date'], '%Y-%m-%d %H:%M:%S').date()
+
+    photos_info_per_day_url = f'https://api.nasa.gov/EPIC/api/natural/date/{date.strftime("%Y-%m-%d")}'
     response = requests.get(photos_info_per_day_url, params=params)
     response.raise_for_status()
     photos_info = response.json()
     os.makedirs(filespath, exist_ok=True)
     for photo in photos_info:
-        earth_photo_url = f'https://api.nasa.gov/EPIC/archive/natural/2022/02/12/png/{photo["image"]}.png'
+        earth_photo_url = \
+            f'https://api.nasa.gov/EPIC/archive/natural/{date.strftime("%Y/%m/%d")}/png/{photo["image"]}.png'
         download_image(earth_photo_url, filespath, params)
 
 
